@@ -1,0 +1,38 @@
+version: "1.0"
+
+services:
+  # Backend Service
+  ecommerce-backend-nodejs:
+    build:
+      context: ./ecommerce-backend-nodejs
+      dockerfile: Dockerfile
+    # volumes:
+    #   - $PWD/ecommerce-backend-nodejs/data:/usr/src/app/data
+    ports:
+      - "${ECOMMERCE_BACKEND_NODEJS_PORT}:${SERVICE_HTTP_PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      APP_PORT: ${SERVICE_HTTP_PORT}
+      MONGO_URL: ${MONGO_URL}
+    restart: unless-stopped
+
+    # Frontend Service
+  ecommerce-frontend-react:
+    build:
+      context: ./ecommerce-frontend-react
+      dockerfile: Dockerfile
+    volumes:
+      - $PWD/ecommerce-frontend-react/public:/usr/src/app/public
+      - $PWD/ecommerce-frontend-react/src:/usr/src/app/src
+      - $PWD/ecommerce-frontend-react/vite.config.js:/usr/src/app/vite.config.js
+      - $PWD/ecommerce-frontend-react/index.html:/usr/src/app/index.html
+
+    ports:
+      #Exposed port: running service port
+      - "${ECOMMERCE_FRONTEND_REACT_PORT}:${SERVICE_HTTP_PORT}"
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      APP_PORT: ${SERVICE_HTTP_PORT}
+      REACT_APP_AUTHO_DOMAIN: ${REACT_APP_AUTHO_DOMAIN}
+      REACT_APP_AUTHO_CLIENT_ID: ${REACT_APP_AUTHO_CLIENT_ID}
+    restart: unless-stopped
